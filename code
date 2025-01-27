@@ -1,0 +1,38 @@
+import azure.cognitiveservices.speech as speechsdk
+
+# Substitua pelas suas chaves de acesso
+speech_key, service_region = "key", "regiao"
+
+# Cria uma configuração com a chave e a região
+speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
+
+def speech_to_text_and_translate():
+    # Criar uma instância para o microfone padrão
+    audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
+
+    # Configuração para reconhecimento de fala e tradução
+    translation_config = speechsdk.translation.SpeechTranslationConfig(
+        subscription=speech_key,
+        region=service_region,
+        speech_recognition_language="en-US",
+        target_languages=("pt-BR"))
+
+    # Criar um reconhecedor que combina reconhecimento de fala e tradução
+    recognizer = speechsdk.translation.TranslationRecognizer(
+        translation_config=translation_config,
+        audio_config=audio_config)
+
+    print("Fale algo:")
+
+    result = recognizer.recognize_once()
+
+    if result.reason == speechsdk.ResultReason.RecognizedSpeech:
+        print("Reconhecido: {}".format(result.text))
+        print("Tradução PT: {}".format(result.translations["pt-BR"]))
+    elif result.reason == speechsdk.ResultReason.NoMatch:
+        print("Não foi possível reconhecer a fala.")
+    else:
+        print("Ocorreu um erro: {}".format(result))
+
+if __name__ == "__main__":
+    speech_to_text_and_translate()
